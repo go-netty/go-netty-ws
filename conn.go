@@ -102,6 +102,7 @@ func (c *wsConn) SetUserdata(userdata interface{}) {
 func (c *wsConn) HandleActive(ctx netty.ActiveContext) {
 	if nil != c.onOpen {
 		c.onOpen(c)
+		return
 	}
 	ctx.HandleActive()
 }
@@ -110,6 +111,7 @@ func (c *wsConn) HandleRead(ctx netty.InboundContext, message netty.Message) {
 	if c.onData != nil {
 		buffer := message.(*bytes.Buffer)
 		c.onData(c, buffer.Bytes())
+		return
 	}
 	ctx.HandleRead(message)
 }
@@ -126,6 +128,7 @@ func (c *wsConn) HandleInactive(ctx netty.InactiveContext, ex netty.Exception) {
 
 	if nil != c.onClose {
 		c.onClose(c, ex)
+		return
 	}
 	ctx.HandleInactive(ex)
 }

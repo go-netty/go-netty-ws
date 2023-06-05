@@ -1,6 +1,20 @@
 # go-netty-ws
 
-An Websocket server written by [go-netty](https://github.com/go-netty/go-netty)
+[![GoDoc][1]][2] [![license-Apache 2][3]][4]
+
+<!--[![Downloads][7]][8]-->
+
+[1]: https://godoc.org/github.com/go-netty/go-netty-ws?status.svg
+[2]: https://godoc.org/github.com/go-netty/go-netty-ws
+[3]: https://img.shields.io/badge/license-Apache%202-blue.svg
+[4]: LICENSE
+
+An Websocket server & client written by [go-netty](https://github.com/go-netty/go-netty)
+
+## Install
+```
+go get github.com/go-netty/go-netty-ws@latest
+```
 
 ## Example
 

@@ -40,6 +40,7 @@ func (wso *wsOptions) ToOptions() *websocket.Options {
 		MaxFrameSize:    int64(wso.maxFrameSize),
 		ReadBufferSize:  wso.readBufferSize,
 		WriteBufferSize: wso.writeBufferSize,
+		Backlog:         256,
 		Dialer:          ws.DefaultDialer,
 		Upgrader:        ws.DefaultHTTPUpgrader,
 		ServeMux:        wso.serveMux,
@@ -48,44 +49,66 @@ func (wso *wsOptions) ToOptions() *websocket.Options {
 
 type Option func(*wsOptions)
 
+// WithEngine overwrite default engine
 func WithEngine(engine netty.Bootstrap) Option {
 	return func(options *wsOptions) {
 		options.engine = engine
 	}
 }
 
+// WithServeMux overwrite default http.ServeMux
 func WithServeMux(serveMux *http.ServeMux) Option {
 	return func(options *wsOptions) {
 		options.serveMux = serveMux
 	}
 }
 
+// WithServeTLS serve port with TLS
 func WithServeTLS(certFile, keyFile string) Option {
 	return func(options *wsOptions) {
 		options.certFile, options.keyFile = certFile, keyFile
 	}
 }
 
+// WithBinary switch to binary message mode
 func WithBinary() Option {
 	return func(options *wsOptions) {
 		options.messageType = MsgBinary
 	}
 }
 
+// WithValidUTF8 enable UTF-8 checks for text frames payload
 func WithValidUTF8() Option {
 	return func(options *wsOptions) {
 		options.checkUTF8 = true
 	}
 }
 
+// WithMaxFrameSize set the maximum frame size
 func WithMaxFrameSize(maxFrameSize int) Option {
 	return func(options *wsOptions) {
 		options.maxFrameSize = maxFrameSize
 	}
 }
 
+// WithBufferSize set the read/write buffer size
 func WithBufferSize(readBufferSize, writeBufferSize int) Option {
 	return func(options *wsOptions) {
 		options.readBufferSize, options.writeBufferSize = readBufferSize, writeBufferSize
+	}
+}
+
+// WithAsyncWrite enable async write
+func WithAsyncWrite(capacity int) Option {
+	return func(options *wsOptions) {
+		if options.engine != engine {
+			panic("please use `netty.NewAsyncWriteChannel(...)` instead of `netty.NewChannel()` in your engine configure")
+		}
+		options.engine = netty.NewBootstrap(
+			netty.WithTransport(websocket.New()),
+			netty.WithChannel(netty.NewAsyncWriteChannel(capacity)),
+			netty.WithClientInitializer(clientInitializer),
+			netty.WithChildInitializer(childInitializer),
+		)
 	}
 }
