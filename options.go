@@ -99,14 +99,14 @@ func WithBufferSize(readBufferSize, writeBufferSize int) Option {
 }
 
 // WithAsyncWrite enable async write
-func WithAsyncWrite(capacity int) Option {
+func WithAsyncWrite(writeQueueSize int, writeForever bool) Option {
 	return func(options *wsOptions) {
 		if options.engine != defaultEngine {
 			panic("please use `netty.NewAsyncWriteChannel(...)` instead of `netty.NewChannel()` in your engine configure")
 		}
 		options.engine = netty.NewBootstrap(
 			netty.WithTransport(websocket.New()),
-			netty.WithChannel(netty.NewAsyncWriteChannel(capacity)),
+			netty.WithChannel(netty.NewAsyncWriteChannel(writeQueueSize, writeForever)),
 			netty.WithClientInitializer(clientInitializer),
 			netty.WithChildInitializer(childInitializer),
 		)
