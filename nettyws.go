@@ -29,7 +29,7 @@ type Websocket struct {
 // NewWebsocket create websocket instance with url and options
 func NewWebsocket(url string, options ...Option) *Websocket {
 	opts := &wsOptions{
-		engine:          engine,
+		engine:          defaultEngine,
 		serveMux:        http.NewServeMux(),
 		messageType:     MsgText,
 		readBufferSize:  1024,
@@ -45,7 +45,7 @@ func NewWebsocket(url string, options ...Option) *Websocket {
 
 // Open websocket client
 func (ws *Websocket) Open() error {
-	_, err := engine.Connect(ws.url, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options.ToOptions()))
+	_, err := ws.options.engine.Connect(ws.url, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options.ToOptions()))
 	return err
 }
 
@@ -54,7 +54,7 @@ func (ws *Websocket) Listen() error {
 	if nil != ws.listener {
 		return fmt.Errorf("duplicate listen")
 	}
-	ws.listener = engine.Listen(ws.url, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options.ToOptions()))
+	ws.listener = ws.options.engine.Listen(ws.url, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options.ToOptions()))
 	return ws.listener.Sync()
 }
 

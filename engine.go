@@ -6,7 +6,7 @@ import (
 	"github.com/go-netty/go-netty/codec/frame"
 )
 
-var engine = netty.NewBootstrap(
+var defaultEngine = netty.NewBootstrap(
 	netty.WithTransport(websocket.New()),
 	netty.WithChannel(netty.NewChannel()),
 	netty.WithClientInitializer(clientInitializer),

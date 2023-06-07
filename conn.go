@@ -31,7 +31,7 @@ type Conn interface {
 	SetDeadline(t time.Time) error
 	SetReadDeadline(t time.Time) error
 	SetWriteDeadline(t time.Time) error
-	Write(message Message) error
+	Write(message []byte) error
 	WriteClose(code int, reason string) error
 	Close() error
 	Userdata() interface{}
@@ -75,8 +75,9 @@ func (c *wsConn) SetWriteDeadline(t time.Time) error {
 	return c.channel.Transport().SetWriteDeadline(t)
 }
 
-func (c *wsConn) Write(message Message) error {
-	return c.channel.Write(message)
+func (c *wsConn) Write(message []byte) error {
+	_, err := c.channel.Write1(message)
+	return err
 }
 
 func (c *wsConn) WriteClose(code int, reason string) error {

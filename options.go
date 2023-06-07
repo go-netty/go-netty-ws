@@ -101,7 +101,7 @@ func WithBufferSize(readBufferSize, writeBufferSize int) Option {
 // WithAsyncWrite enable async write
 func WithAsyncWrite(capacity int) Option {
 	return func(options *wsOptions) {
-		if options.engine != engine {
+		if options.engine != defaultEngine {
 			panic("please use `netty.NewAsyncWriteChannel(...)` instead of `netty.NewChannel()` in your engine configure")
 		}
 		options.engine = netty.NewBootstrap(
