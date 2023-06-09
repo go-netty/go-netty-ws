@@ -16,7 +16,8 @@ type OnDataFunc func(conn Conn, data []byte)
 type OnCloseFunc func(conn Conn, err error)
 
 type Websocket struct {
-	options   *wsOptions
+	engine    netty.Bootstrap
+	options   *websocket.Options
 	ctx       context.Context
 	cancel    context.CancelFunc
 	listeners sync.Map // map<url , netty.Listener>
@@ -30,34 +31,28 @@ type Websocket struct {
 
 // NewWebsocket create websocket instance with url and options
 func NewWebsocket(options ...Option) *Websocket {
-	opts := &wsOptions{
-		engine:          defaultEngine,
-		serveMux:        http.NewServeMux(),
-		messageType:     MsgText,
-		readBufferSize:  1024,
-		writeBufferSize: 0,
-	}
-	for _, op := range options {
-		op(opts)
-	}
+	opts := parseOptions(options...)
 
-	ws := &Websocket{options: opts, holder: NewChannelHolder(1024)}
+	ws := &Websocket{}
+	ws.engine = opts.engine
+	ws.options = opts.wsOptions()
+	ws.holder = NewChannelHolder(1024)
 	ws.ctx, ws.cancel = context.WithCancel(opts.engine.Context())
-	ws.upgrader = websocket.NewHTTPUpgrader(opts.engine, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options.ToOptions()))
+	ws.upgrader = websocket.NewHTTPUpgrader(opts.engine, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
 	ws.upgrader.Upgrader = opts.upgrader
 	return ws
 }
 
 // Open websocket client
 func (ws *Websocket) Open(addr string) error {
-	_, err := ws.options.engine.Connect(addr, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options.ToOptions()))
+	_, err := ws.engine.Connect(addr, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
 	return err
 }
 
 // Listen serve addr on this server
 func (ws *Websocket) Listen(addr string) error {
 	// create listener
-	listener := ws.options.engine.Listen(addr, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options.ToOptions()))
+	listener := ws.engine.Listen(addr, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
 	ws.listeners.Store(addr, listener)
 
 	defer func() {
@@ -78,12 +73,17 @@ func (ws *Websocket) Close() error {
 	// close all listeners
 	ws.listeners.Range(func(key, value interface{}) bool {
 		ws.listeners.Delete(key)
-		value.(netty.Listener).Close()
+		_ = value.(netty.Listener).Close()
 		return true
 	})
 
 	// close all connections
 	ws.holder.CloseAll(ClosedError{Code: 1000, Reason: "websocket shutdown"})
+
+	// stop the custom engine
+	if defaultEngine != ws.engine {
+		ws.engine.Shutdown()
+	}
 	return nil
 }
 
@@ -92,7 +92,7 @@ func (ws *Websocket) UpgradeHTTP(writer http.ResponseWriter, request *http.Reque
 
 	select {
 	case <-ws.ctx.Done():
-		return nil, fmt.Errorf("websocket closed")
+		return nil, netty.ErrServerClosed
 	default:
 	}
 
