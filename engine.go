@@ -34,6 +34,6 @@ func makeInitializer(client bool) netty.ChannelInitializer {
 		channel.Pipeline().
 			AddLast(ws.holder).
 			AddLast(frame.PacketCodec(1024)).
-			AddLast(NewConn(channel, client, ws.OnOpen, ws.OnData, ws.OnClose))
+			AddLast(newConn(ws, channel, client))
 	}
 }

@@ -17,12 +17,12 @@ type OnCloseFunc func(conn Conn, err error)
 
 type Websocket struct {
 	engine    netty.Bootstrap
+	holder    netty.ChannelHolder
 	options   *websocket.Options
 	ctx       context.Context
 	cancel    context.CancelFunc
 	listeners sync.Map // map<url , netty.Listener>
 	upgrader  websocket.HTTPUpgrader
-	holder    netty.ChannelHolder
 
 	OnOpen  OnOpenFunc
 	OnData  OnDataFunc
@@ -35,8 +35,8 @@ func NewWebsocket(options ...Option) *Websocket {
 
 	ws := &Websocket{}
 	ws.engine = opts.engine
-	ws.options = opts.wsOptions()
 	ws.holder = NewChannelHolder(1024)
+	ws.options = opts.wsOptions()
 	ws.ctx, ws.cancel = context.WithCancel(opts.engine.Context())
 	ws.upgrader = websocket.NewHTTPUpgrader(opts.engine, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
 	ws.upgrader.Upgrader = opts.upgrader

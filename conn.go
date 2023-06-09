@@ -43,22 +43,20 @@ type Conn interface {
 	SetUserdata(userdata interface{})
 }
 
-// NewConn create a websocket connection.
-func NewConn(channel netty.Channel, client bool, onOpen OnOpenFunc, onData OnDataFunc, onClose OnCloseFunc) Conn {
-	return &wsConn{channel: channel, client: client, onOpen: onOpen, onData: onData, onClose: onClose}
-}
-
 type wsc interface {
 	WriteClose(code int, reason string) error
 }
 
 type wsConn struct {
+	ws       *Websocket
 	channel  netty.Channel
 	client   bool
-	onOpen   OnOpenFunc
-	onData   OnDataFunc
-	onClose  OnCloseFunc
 	userdata interface{}
+}
+
+// newConn create a websocket connection.
+func newConn(ws *Websocket, channel netty.Channel, client bool) Conn {
+	return &wsConn{ws: ws, channel: channel, client: client}
 }
 
 // Context returns the context of the connection.
@@ -127,17 +125,16 @@ func (c *wsConn) SetUserdata(userdata interface{}) {
 }
 
 func (c *wsConn) HandleActive(ctx netty.ActiveContext) {
-	if nil != c.onOpen {
-		c.onOpen(c)
+	if onOpen := c.ws.OnOpen; nil != onOpen {
+		onOpen(c)
 		return
 	}
 	ctx.HandleActive()
 }
 
 func (c *wsConn) HandleRead(ctx netty.InboundContext, message netty.Message) {
-	if c.onData != nil {
-		buffer := message.(*bytes.Buffer)
-		c.onData(c, buffer.Bytes())
+	if onData := c.ws.OnData; onData != nil {
+		onData(c, message.(*bytes.Buffer).Bytes())
 		return
 	}
 	ctx.HandleRead(message)
@@ -153,8 +150,8 @@ func (c *wsConn) HandleInactive(ctx netty.InactiveContext, ex netty.Exception) {
 		ex = ClosedError{Code: int(closeErr.Code), Reason: closeErr.Reason}
 	}
 
-	if nil != c.onClose {
-		c.onClose(c, ex)
+	if onClose := c.ws.OnClose; nil != onClose {
+		onClose(c, ex)
 		return
 	}
 	ctx.HandleInactive(ex)
