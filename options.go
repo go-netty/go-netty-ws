@@ -15,13 +15,16 @@ const (
 	MsgBinary
 )
 
+type HTTPUpgrader = ws.HTTPUpgrader
+
 type wsOptions struct {
 	engine          netty.Bootstrap
 	serveMux        *http.ServeMux
+	upgrader        HTTPUpgrader
 	certFile        string
 	keyFile         string
 	checkUTF8       bool
-	maxFrameSize    int
+	maxFrameSize    int64
 	readBufferSize  int
 	writeBufferSize int
 	messageType     MessageType
@@ -37,7 +40,7 @@ func (wso *wsOptions) ToOptions() *websocket.Options {
 		Key:             wso.keyFile,
 		OpCode:          opCode,
 		CheckUTF8:       wso.checkUTF8,
-		MaxFrameSize:    int64(wso.maxFrameSize),
+		MaxFrameSize:    wso.maxFrameSize,
 		ReadBufferSize:  wso.readBufferSize,
 		WriteBufferSize: wso.writeBufferSize,
 		Backlog:         256,
@@ -85,7 +88,7 @@ func WithValidUTF8() Option {
 }
 
 // WithMaxFrameSize set the maximum frame size
-func WithMaxFrameSize(maxFrameSize int) Option {
+func WithMaxFrameSize(maxFrameSize int64) Option {
 	return func(options *wsOptions) {
 		options.maxFrameSize = maxFrameSize
 	}
@@ -107,8 +110,16 @@ func WithAsyncWrite(writeQueueSize int, writeForever bool) Option {
 		options.engine = netty.NewBootstrap(
 			netty.WithTransport(websocket.New()),
 			netty.WithChannel(netty.NewAsyncWriteChannel(writeQueueSize, writeForever)),
+			netty.WithChannelHolder(nil),
 			netty.WithClientInitializer(clientInitializer),
 			netty.WithChildInitializer(childInitializer),
 		)
+	}
+}
+
+// WithUpgrader set the HTTPUpgrader
+func WithUpgrader(upgrader HTTPUpgrader) Option {
+	return func(options *wsOptions) {
+		options.upgrader = upgrader
 	}
 }

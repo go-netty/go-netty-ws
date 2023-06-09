@@ -9,6 +9,7 @@ import (
 var defaultEngine = netty.NewBootstrap(
 	netty.WithTransport(websocket.New()),
 	netty.WithChannel(netty.NewChannel()),
+	netty.WithChannelHolder(nil),
 	netty.WithClientInitializer(clientInitializer),
 	netty.WithChildInitializer(childInitializer),
 )
@@ -16,6 +17,7 @@ var defaultEngine = netty.NewBootstrap(
 func clientInitializer(channel netty.Channel) {
 	ws := channel.Attachment().(*Websocket)
 	channel.Pipeline().
+		AddLast(ws.holder).
 		AddLast(frame.PacketCodec(1024)).
 		AddLast(NewConn(channel, true, ws.OnOpen, ws.OnData, ws.OnClose))
 }
@@ -23,6 +25,7 @@ func clientInitializer(channel netty.Channel) {
 func childInitializer(channel netty.Channel) {
 	ws := channel.Attachment().(*Websocket)
 	channel.Pipeline().
+		AddLast(ws.holder).
 		AddLast(frame.PacketCodec(1024)).
 		AddLast(NewConn(channel, false, ws.OnOpen, ws.OnData, ws.OnClose))
 }

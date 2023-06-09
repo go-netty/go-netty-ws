@@ -42,6 +42,10 @@ func NewConn(channel netty.Channel, client bool, onOpen OnOpenFunc, onData OnDat
 	return &wsConn{channel: channel, client: client, onOpen: onOpen, onData: onData, onClose: onClose}
 }
 
+type wsc interface {
+	WriteClose(code int, reason string) error
+}
+
 type wsConn struct {
 	channel  netty.Channel
 	client   bool
@@ -81,10 +85,7 @@ func (c *wsConn) Write(message []byte) error {
 }
 
 func (c *wsConn) WriteClose(code int, reason string) error {
-	type wst interface {
-		WriteClose(code int, reason string) error
-	}
-	return c.channel.Transport().(wst).WriteClose(code, reason)
+	return c.channel.Transport().(wsc).WriteClose(code, reason)
 }
 
 func (c *wsConn) Close() error {

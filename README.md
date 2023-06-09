@@ -21,7 +21,7 @@ go get github.com/go-netty/go-netty-ws@latest
 server :
 ```go
 // create websocket instance
-var ws = nettyws.NewWebsocket("ws://127.0.0.1:9527")
+var ws = nettyws.NewWebsocket()
 
 // setup OnOpen handler
 ws.OnOpen = func(conn nettyws.Conn) {
@@ -31,6 +31,7 @@ ws.OnOpen = func(conn nettyws.Conn) {
 // setup OnData handler
 ws.OnData = func(conn nettyws.Conn, data []byte) {
     fmt.Println("OnData: ", conn.RemoteAddr(), ", message: ", string(data))
+    conn.Write(data)
 }
 
 // setup OnClose handler
@@ -40,21 +41,21 @@ ws.OnClose = func(conn nettyws.Conn, err error) {
 
 fmt.Println("listening websocket connections ....")
 
-// listening websocket server
-if err := ws.Listen(); nil != err {
+// listen websocket server
+if err := ws.Listen("ws://127.0.0.1:9527/ws"); nil != err {
     panic(err)
 }
-
 ```
 
 client :
 ```go
 // create websocket instance
-var ws = nettyws.NewWebsocket("ws://127.0.0.1:9527")
+var ws = nettyws.NewWebsocket()
 
 // setup OnOpen handler
 ws.OnOpen = func(conn nettyws.Conn) {
     fmt.Println("OnOpen: ", conn.RemoteAddr())
+    conn.Write([]byte("hello world"))
 }
 
 // setup OnData handler
@@ -70,7 +71,42 @@ ws.OnClose = func(conn nettyws.Conn, err error) {
 fmt.Println("open websocket connection ...")
 
 // connect to websocket server
-if err := ws.Open(); nil != err {
+if err := ws.Open("ws://127.0.0.1:9527/ws"); nil != err {
+    panic(err)
+}
+```
+
+upgrade from http server:
+```go
+// create websocket instance
+var ws = nettyws.NewWebsocket()
+
+// setup OnOpen handler
+ws.OnOpen = func(conn nettyws.Conn) {
+    fmt.Println("OnOpen: ", conn.RemoteAddr())
+}
+
+// setup OnData handler
+ws.OnData = func(conn nettyws.Conn, data []byte) {
+    fmt.Println("OnData: ", conn.RemoteAddr(), ", message: ", string(data))
+    conn.Write(data)
+}
+
+// setup OnClose handler
+ws.OnClose = func(conn nettyws.Conn, err error) {
+    fmt.Println("OnClose: ", conn.RemoteAddr(), ", error: ", err)
+}
+
+fmt.Println("upgrade websocket connections ....")
+
+// upgrade websocket connection from http server
+serveMux := http.NewServeMux()
+serveMux.HandleFunc("/ws", func(writer http.ResponseWriter, request *http.Request) {
+    ws.UpgradeHTTP(writer, request)
+})
+
+// listen http server
+if err := http.ListenAndServe(":9527", serveMux); nil != err {
     panic(err)
 }
 ```

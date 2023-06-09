@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	nettyws "github.com/go-netty/go-netty-ws"
 )
 
 func main() {
+
 	// create websocket instance
 	var ws = nettyws.NewWebsocket()
 
@@ -26,9 +28,16 @@ func main() {
 		fmt.Println("OnClose: ", conn.RemoteAddr(), ", error: ", err)
 	}
 
-	fmt.Println("listening websocket connections ....")
-	// listen websocket server
-	if err := ws.Listen("ws://127.0.0.1:9527/ws"); nil != err {
+	fmt.Println("upgrade websocket connections ....")
+
+	// upgrade websocket connection from http server
+	serveMux := http.NewServeMux()
+	serveMux.HandleFunc("/ws", func(writer http.ResponseWriter, request *http.Request) {
+		ws.UpgradeHTTP(writer, request)
+	})
+
+	// listen http server
+	if err := http.ListenAndServe(":9527", serveMux); nil != err {
 		panic(err)
 	}
 }

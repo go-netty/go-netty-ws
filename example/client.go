@@ -9,7 +9,7 @@ import (
 func main() {
 
 	// create websocket instance
-	var ws = nettyws.NewWebsocket("ws://127.0.0.1:9527")
+	var ws = nettyws.NewWebsocket()
 
 	// setup OnOpen handler
 	ws.OnOpen = func(conn nettyws.Conn) {
@@ -30,7 +30,7 @@ func main() {
 	fmt.Println("open websocket connection ...")
 
 	// connect to websocket server
-	if err := ws.Open(); nil != err {
+	if err := ws.Open("ws://127.0.0.1:9527/ws"); nil != err {
 		panic(err)
 	}
 
