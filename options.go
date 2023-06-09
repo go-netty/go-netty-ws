@@ -119,8 +119,8 @@ func WithAsyncWrite(writeQueueSize int, writeForever bool) Option {
 			netty.WithTransport(websocket.New()),
 			netty.WithChannel(netty.NewAsyncWriteChannel(writeQueueSize, writeForever)),
 			netty.WithChannelHolder(nil),
-			netty.WithClientInitializer(clientInitializer),
-			netty.WithChildInitializer(childInitializer),
+			netty.WithClientInitializer(makeInitializer(true)),
+			netty.WithChildInitializer(makeInitializer(false)),
 		)
 	}
 }
