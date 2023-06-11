@@ -18,20 +18,19 @@ const (
 	MsgBinary
 )
 
-// HTTPUpgrader contains options for upgrading connection to websocket from net/http Handler arguments.
-type HTTPUpgrader = ws.HTTPUpgrader
-
 type options struct {
-	engine          netty.Bootstrap
-	serveMux        *http.ServeMux
-	upgrader        HTTPUpgrader
-	certFile        string
-	keyFile         string
-	checkUTF8       bool
-	maxFrameSize    int64
-	readBufferSize  int
-	writeBufferSize int
-	messageType     MessageType
+	engine            netty.Bootstrap
+	serveMux          *http.ServeMux
+	certFile          string
+	keyFile           string
+	checkUTF8         bool
+	maxFrameSize      int64
+	readBufferSize    int
+	writeBufferSize   int
+	messageType       MessageType
+	compressEnabled   bool
+	compressLevel     int
+	compressThreshold int64
 }
 
 func parseOptions(opt ...Option) *options {
@@ -54,17 +53,20 @@ func (wso *options) wsOptions() *websocket.Options {
 		opCode = ws.OpBinary
 	}
 	return &websocket.Options{
-		Cert:            wso.certFile,
-		Key:             wso.keyFile,
-		OpCode:          opCode,
-		CheckUTF8:       wso.checkUTF8,
-		MaxFrameSize:    wso.maxFrameSize,
-		ReadBufferSize:  wso.readBufferSize,
-		WriteBufferSize: wso.writeBufferSize,
-		Backlog:         256,
-		Dialer:          ws.DefaultDialer,
-		Upgrader:        ws.DefaultHTTPUpgrader,
-		ServeMux:        wso.serveMux,
+		Cert:              wso.certFile,
+		Key:               wso.keyFile,
+		OpCode:            opCode,
+		CheckUTF8:         wso.checkUTF8,
+		MaxFrameSize:      wso.maxFrameSize,
+		ReadBufferSize:    wso.readBufferSize,
+		WriteBufferSize:   wso.writeBufferSize,
+		Backlog:           256,
+		CompressEnabled:   wso.compressEnabled,
+		CompressLevel:     wso.compressLevel,
+		CompressThreshold: wso.compressThreshold,
+		Dialer:            ws.DefaultDialer,
+		Upgrader:          ws.DefaultHTTPUpgrader,
+		ServeMux:          wso.serveMux,
 	}
 }
 
@@ -125,9 +127,11 @@ func WithAsyncWrite(writeQueueSize int, writeForever bool) Option {
 	}
 }
 
-// WithUpgrader set the HTTPUpgrader
-func WithUpgrader(upgrader HTTPUpgrader) Option {
+// WithCompress enable message compression with level, messages below the threshold will not be compressed.
+func WithCompress(compressLevel int, compressThreshold int64) Option {
 	return func(options *options) {
-		options.upgrader = upgrader
+		options.compressEnabled = true
+		options.compressLevel = compressLevel
+		options.compressThreshold = compressThreshold
 	}
 }

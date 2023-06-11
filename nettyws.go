@@ -9,6 +9,7 @@ import (
 	"github.com/go-netty/go-netty"
 	"github.com/go-netty/go-netty-transport/websocket"
 	"github.com/go-netty/go-netty/transport"
+	"github.com/gobwas/ws/wsflate"
 )
 
 type OnOpenFunc func(conn Conn)
@@ -39,7 +40,14 @@ func NewWebsocket(options ...Option) *Websocket {
 	ws.options = opts.wsOptions()
 	ws.ctx, ws.cancel = context.WithCancel(opts.engine.Context())
 	ws.upgrader = websocket.NewHTTPUpgrader(opts.engine, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
-	ws.upgrader.Upgrader = opts.upgrader
+
+	e := wsflate.Extension{
+		Parameters: wsflate.Parameters{
+			ServerNoContextTakeover: true,
+			ClientNoContextTakeover: true,
+		},
+	}
+	ws.upgrader.Upgrader.Negotiate = e.Negotiate
 	return ws
 }
 

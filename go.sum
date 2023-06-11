@@ -34,10 +34,10 @@ github.com/fsnotify/fsnotify v1.5.4/go.mod h1:OVB6XrOHzAwXMpEM7uPOzcehqUV2UqJxmV
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/gliderlabs/ssh v0.1.1/go.mod h1:U7qILu1NlMHj9FlMhZLlkCdDnU1DBEAqr0aevW3Awn0=
 github.com/go-errors/errors v1.0.1/go.mod h1:f4zRHt4oKfwPJE5k8C9vpYG+aDHdBFUsgrm6/TyX73Q=
-github.com/go-netty/go-netty v1.6.0 h1:Y8kGZI/u51gyRuLWME8/LH7qIx9M/LiZj4DK3XRM2QY=
-github.com/go-netty/go-netty v1.6.0/go.mod h1:6JFBrWKbLTnPA6BOruhWCcXifoalc4TqqMqXZ1760Mw=
-github.com/go-netty/go-netty-transport v1.6.0 h1:3DTtKmfKr/HgVro2RNk+X9RWoZHuFEiPEBlohSUoZ04=
-github.com/go-netty/go-netty-transport v1.6.0/go.mod h1:nioCMYgP297r7UqU7EYuaAGPYzkmrSjTFZZZb1hQyY8=
+github.com/go-netty/go-netty v1.6.1 h1:9jUwltGD1M1VrcZUW8NDuSi6rUy1xrc/t+TjXTbuQro=
+github.com/go-netty/go-netty v1.6.1/go.mod h1:6JFBrWKbLTnPA6BOruhWCcXifoalc4TqqMqXZ1760Mw=
+github.com/go-netty/go-netty-transport v1.6.1 h1:IxzHnk8Odf5pVXngmB0ZQLb3BLP9jOtFCPbRFjjABU8=
+github.com/go-netty/go-netty-transport v1.6.1/go.mod h1:YVXVstfC1pH5zK/vIwOWH3LrvlBpcD8Ad0PonlvB0ls=
 github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0/go.mod h1:fyg7847qk6SyHyPtNmDHnmrv/HOrqktSC+C9fM+CJOE=
 github.com/gobwas/httphead v0.1.0 h1:exrUm0f4YX0L7EBwZHuCF4GDp8aJfVeBrlLQrs6NqWU=
 github.com/gobwas/httphead v0.1.0/go.mod h1:O/RXo79gxV8G+RqlR/otEwx4Q36zl9rqC5u12GKvMCM=
