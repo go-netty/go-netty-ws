@@ -16,9 +16,29 @@ An Websocket server & client written by [go-netty](https://github.com/go-netty/g
 go get github.com/go-netty/go-netty-ws@latest
 ```
 
-## Example
+## API overview
+```
+type Websocket
+    func NewWebsocket(options ...Option) *Websocket
+    func (ws *Websocket) Close() error
+    func (ws *Websocket) Listen(addr string) error
+    func (ws *Websocket) Open(addr string) error
+    func (ws *Websocket) UpgradeHTTP(writer http.ResponseWriter, request *http.Request) (conn Conn, err error)
 
-server :
+type Option
+    func WithAsyncWrite(writeQueueSize int, writeForever bool) Option
+    func WithBinary() Option
+    func WithBufferSize(readBufferSize, writeBufferSize int) Option
+    func WithCompress(compressLevel int, compressThreshold int64) Option
+    func WithMaxFrameSize(maxFrameSize int64) Option
+    func WithServeMux(serveMux *http.ServeMux) Option
+    func WithServeTLS(tls *tls.Config) Option
+    func WithValidUTF8() Option
+```
+
+## Easy to use
+
+### server :
 ```go
 // create websocket instance
 var ws = nettyws.NewWebsocket()
@@ -47,7 +67,7 @@ if err := ws.Listen("ws://127.0.0.1:9527/ws"); nil != err {
 }
 ```
 
-client :
+### client :
 ```go
 // create websocket instance
 var ws = nettyws.NewWebsocket()
@@ -76,7 +96,7 @@ if err := ws.Open("ws://127.0.0.1:9527/ws"); nil != err {
 }
 ```
 
-upgrade from http server:
+### upgrade from http server:
 ```go
 // create websocket instance
 var ws = nettyws.NewWebsocket()
@@ -110,3 +130,10 @@ if err := http.ListenAndServe(":9527", serveMux); nil != err {
     panic(err)
 }
 ```
+
+## Associated
+* https://github.com/go-netty/go-netty
+* https://github.com/go-netty/go-netty-transport
+* https://github.com/gobwas/ws
+* https://github.com/lesismal/go-websocket-benchmark
+* https://github.com/crossbario/autobahn-testsuite

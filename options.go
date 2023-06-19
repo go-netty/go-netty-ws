@@ -1,6 +1,7 @@
 package nettyws
 
 import (
+	"crypto/tls"
 	"net/http"
 
 	"github.com/go-netty/go-netty"
@@ -21,8 +22,7 @@ const (
 type options struct {
 	engine            netty.Bootstrap
 	serveMux          *http.ServeMux
-	certFile          string
-	keyFile           string
+	tls               *tls.Config
 	checkUTF8         bool
 	maxFrameSize      int64
 	readBufferSize    int
@@ -53,8 +53,7 @@ func (wso *options) wsOptions() *websocket.Options {
 		opCode = ws.OpBinary
 	}
 	return &websocket.Options{
-		Cert:              wso.certFile,
-		Key:               wso.keyFile,
+		TLS:               wso.tls,
 		OpCode:            opCode,
 		CheckUTF8:         wso.checkUTF8,
 		MaxFrameSize:      wso.maxFrameSize,
@@ -80,9 +79,9 @@ func WithServeMux(serveMux *http.ServeMux) Option {
 }
 
 // WithServeTLS serve port with TLS
-func WithServeTLS(certFile, keyFile string) Option {
+func WithServeTLS(tls *tls.Config) Option {
 	return func(options *options) {
-		options.certFile, options.keyFile = certFile, keyFile
+		options.tls = tls
 	}
 }
 
