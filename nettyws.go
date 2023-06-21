@@ -29,26 +29,26 @@ type Websocket struct {
 	OnClose OnCloseFunc
 }
 
-// NewWebsocket create websocket instance with url and options
+// NewWebsocket create websocket instance with options
 func NewWebsocket(options ...Option) *Websocket {
 	opts := parseOptions(options...)
 
 	ws := &Websocket{}
 	ws.engine = opts.engine
-	ws.holder = NewChannelHolder(1024)
+	ws.holder = newChannelHolder(1024)
 	ws.options = opts.wsOptions()
 	ws.ctx, ws.cancel = context.WithCancel(opts.engine.Context())
 	ws.upgrader = websocket.NewHTTPUpgrader(opts.engine, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
 	return ws
 }
 
-// Open websocket client
+// Open websocket connection from address
 func (ws *Websocket) Open(addr string) error {
 	_, err := ws.engine.Connect(addr, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
 	return err
 }
 
-// Listen serve addr on this server
+// Listen websocket connections on address
 func (ws *Websocket) Listen(addr string) error {
 	// create listener
 	listener := ws.engine.Listen(addr, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
@@ -86,7 +86,7 @@ func (ws *Websocket) Close() error {
 	return nil
 }
 
-// UpgradeHTTP Upgrade upgrades http connection to the websocket connection
+// UpgradeHTTP upgrades http connection to the websocket connection
 func (ws *Websocket) UpgradeHTTP(writer http.ResponseWriter, request *http.Request) (conn Conn, err error) {
 
 	select {

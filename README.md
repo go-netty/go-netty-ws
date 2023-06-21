@@ -23,7 +23,7 @@ type Websocket
     func (ws *Websocket) Close() error
     func (ws *Websocket) Listen(addr string) error
     func (ws *Websocket) Open(addr string) error
-    func (ws *Websocket) UpgradeHTTP(writer http.ResponseWriter, request *http.Request) (conn Conn, err error)
+    func (ws *Websocket) UpgradeHTTP(w http.ResponseWriter, r *http.Request) (Conn, error)
 
 type Option
     func WithAsyncWrite(writeQueueSize int, writeForever bool) Option

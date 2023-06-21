@@ -7,8 +7,8 @@ import (
 	"github.com/go-netty/go-netty"
 )
 
-// NewChannelHolder create a new ChannelHolder with initial capacity
-func NewChannelHolder(capacity int) netty.ChannelHolder {
+// newChannelHolder create a new ChannelHolder with initial capacity
+func newChannelHolder(capacity int) netty.ChannelHolder {
 	return &channelHolder{channels: make(map[int64]netty.Channel, capacity)}
 }
 
