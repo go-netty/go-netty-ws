@@ -3,6 +3,7 @@ package nettyws
 import (
 	"bytes"
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/go-netty/go-netty"
@@ -17,6 +18,8 @@ type Conn interface {
 	LocalAddr() string
 	// RemoteAddr returns the remote network address.
 	RemoteAddr() string
+	// Header returns the HTTP header on handshake request.
+	Header() http.Header
 	// SetDeadline sets the read and write deadlines associated
 	// with the connection. It is equivalent to calling both
 	// SetReadDeadline and SetWriteDeadline.
@@ -47,6 +50,11 @@ type wsc interface {
 	WriteClose(code int, reason string) error
 }
 
+type wsh interface {
+	Route() string
+	Header() http.Header
+}
+
 type wsConn struct {
 	ws       *Websocket
 	channel  netty.Channel
@@ -72,6 +80,11 @@ func (c *wsConn) LocalAddr() string {
 // RemoteAddr returns the remote network address.
 func (c *wsConn) RemoteAddr() string {
 	return c.channel.RemoteAddr()
+}
+
+// Header returns the HTTP header on handshake request.
+func (c *wsConn) Header() http.Header {
+	return c.channel.Transport().(wsh).Header()
 }
 
 // SetDeadline sets the read and write deadlines associated
