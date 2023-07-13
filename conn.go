@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-netty/go-netty"
+	"github.com/go-netty/go-netty/utils"
 	"github.com/gobwas/ws/wsutil"
 )
 
@@ -146,11 +147,17 @@ func (c *wsConn) HandleActive(ctx netty.ActiveContext) {
 }
 
 func (c *wsConn) HandleRead(ctx netty.InboundContext, message netty.Message) {
-	if onData := c.ws.OnData; onData != nil {
-		onData(c, message.(*bytes.Buffer).Bytes())
-		return
+	var reader = utils.MustToReader(message)
+	var buffer = bytes.NewBuffer(make([]byte, 0, 1024))
+
+	for {
+		buffer.Reset()
+		utils.AssertLong(buffer.ReadFrom(reader))
+
+		if onData := c.ws.OnData; onData != nil {
+			onData(c, buffer.Bytes())
+		}
 	}
-	ctx.HandleRead(message)
 }
 
 func (c *wsConn) HandleException(ctx netty.ExceptionContext, ex netty.Exception) {

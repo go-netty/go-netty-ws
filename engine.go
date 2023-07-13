@@ -5,7 +5,6 @@ import (
 
 	"github.com/go-netty/go-netty"
 	"github.com/go-netty/go-netty-transport/websocket"
-	"github.com/go-netty/go-netty/codec/frame"
 )
 
 // ClosedError returned when peer has closed the connection with appropriate
@@ -33,7 +32,6 @@ func makeInitializer(client bool) netty.ChannelInitializer {
 		ws := channel.Attachment().(*Websocket)
 		channel.Pipeline().
 			AddLast(ws.holder).
-			AddLast(frame.PacketCodec(1024)).
 			AddLast(newConn(ws, channel, client))
 	}
 }

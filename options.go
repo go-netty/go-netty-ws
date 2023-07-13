@@ -38,7 +38,7 @@ func parseOptions(opt ...Option) *options {
 		engine:          defaultEngine,
 		serveMux:        http.NewServeMux(),
 		messageType:     MsgText,
-		readBufferSize:  1024,
+		readBufferSize:  0,
 		writeBufferSize: 0,
 	}
 	for _, op := range opt {
