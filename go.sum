@@ -36,8 +36,8 @@ github.com/gliderlabs/ssh v0.1.1/go.mod h1:U7qILu1NlMHj9FlMhZLlkCdDnU1DBEAqr0aev
 github.com/go-errors/errors v1.0.1/go.mod h1:f4zRHt4oKfwPJE5k8C9vpYG+aDHdBFUsgrm6/TyX73Q=
 github.com/go-netty/go-netty v1.6.3 h1:bx1G6T24tBEbZNleotXDg7a0nnDMO7dPNyHnf1aplTE=
 github.com/go-netty/go-netty v1.6.3/go.mod h1:6JFBrWKbLTnPA6BOruhWCcXifoalc4TqqMqXZ1760Mw=
-github.com/go-netty/go-netty-transport v1.7.1 h1:2sTkr7c5keqmPzXxLFLW0E41sJdRjs30dfl/YgRmarw=
-github.com/go-netty/go-netty-transport v1.7.1/go.mod h1:Yd5N7u9wG6XGI2S5sIOi5XRkUgUgDcDfnl0PCCAa9U0=
+github.com/go-netty/go-netty-transport v1.7.2 h1:bYi9eNuX00kVfcIgxt8LjD5qLUrdh/6UKUnwVm5F5lw=
+github.com/go-netty/go-netty-transport v1.7.2/go.mod h1:Yd5N7u9wG6XGI2S5sIOi5XRkUgUgDcDfnl0PCCAa9U0=
 github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0/go.mod h1:fyg7847qk6SyHyPtNmDHnmrv/HOrqktSC+C9fM+CJOE=
 github.com/gobwas/httphead v0.1.0 h1:exrUm0f4YX0L7EBwZHuCF4GDp8aJfVeBrlLQrs6NqWU=
 github.com/gobwas/httphead v0.1.0/go.mod h1:O/RXo79gxV8G+RqlR/otEwx4Q36zl9rqC5u12GKvMCM=

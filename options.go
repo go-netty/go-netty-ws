@@ -60,6 +60,7 @@ func (wso *options) wsOptions() *websocket.Options {
 		ReadBufferSize:    wso.readBufferSize,
 		WriteBufferSize:   wso.writeBufferSize,
 		Backlog:           256,
+		NoDelay:           false,
 		CompressEnabled:   wso.compressEnabled,
 		CompressLevel:     wso.compressLevel,
 		CompressThreshold: wso.compressThreshold,
