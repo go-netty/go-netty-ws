@@ -23,6 +23,7 @@ type options struct {
 	engine            netty.Bootstrap
 	serveMux          *http.ServeMux
 	tls               *tls.Config
+	noDelay           bool
 	checkUTF8         bool
 	maxFrameSize      int64
 	readBufferSize    int
@@ -38,6 +39,7 @@ func parseOptions(opt ...Option) *options {
 		engine:          defaultEngine,
 		serveMux:        http.NewServeMux(),
 		messageType:     MsgText,
+		noDelay:         true,
 		readBufferSize:  0,
 		writeBufferSize: 0,
 	}
@@ -60,7 +62,7 @@ func (wso *options) wsOptions() *websocket.Options {
 		ReadBufferSize:    wso.readBufferSize,
 		WriteBufferSize:   wso.writeBufferSize,
 		Backlog:           256,
-		NoDelay:           false,
+		NoDelay:           wso.noDelay,
 		CompressEnabled:   wso.compressEnabled,
 		CompressLevel:     wso.compressLevel,
 		CompressThreshold: wso.compressThreshold,
@@ -97,6 +99,16 @@ func WithBinary() Option {
 func WithValidUTF8() Option {
 	return func(options *options) {
 		options.checkUTF8 = true
+	}
+}
+
+// WithNoDelay controls whether the operating system should delay
+// packet transmission in hopes of sending fewer packets (Nagle's
+// algorithm).  The default is true (no delay), meaning that data is
+// sent as soon as possible after a Write.
+func WithNoDelay(noDelay bool) Option {
+	return func(o *options) {
+		o.noDelay = noDelay
 	}
 }
 
