@@ -31,6 +31,7 @@ type Option
     func WithBufferSize(readBufferSize, writeBufferSize int) Option
     func WithCompress(compressLevel int, compressThreshold int64) Option
     func WithMaxFrameSize(maxFrameSize int64) Option
+    func WithNoDelay(noDelay bool) Option
     func WithServeMux(serveMux *http.ServeMux) Option
     func WithServeTLS(tls *tls.Config) Option
     func WithValidUTF8() Option
