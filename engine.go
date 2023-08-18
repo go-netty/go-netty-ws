@@ -35,6 +35,9 @@ func (err ClosedError) Error() string {
 	return "ws closed: " + strconv.FormatUint(uint64(err.Code), 10) + " " + err.Reason
 }
 
+// ErrServerClosed is returned by the Server call Shutdown or Close
+var ErrServerClosed = netty.ErrServerClosed
+
 var defaultEngine = netty.NewBootstrap(
 	netty.WithTransport(websocket.New()),
 	netty.WithChannel(netty.NewChannel()),

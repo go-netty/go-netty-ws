@@ -107,7 +107,7 @@ func (ws *Websocket) UpgradeHTTP(writer http.ResponseWriter, request *http.Reque
 
 	select {
 	case <-ws.ctx.Done():
-		return nil, netty.ErrServerClosed
+		return nil, ErrServerClosed
 	default:
 	}
 
