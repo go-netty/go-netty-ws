@@ -167,12 +167,22 @@ func (c *wsConn) HandleRead(ctx netty.InboundContext, message netty.Message) {
 	var buffer = bytes.NewBuffer(make([]byte, 0, 1024))
 
 	for {
+		// reset buffer
 		buffer.Reset()
-		utils.AssertLong(buffer.ReadFrom(reader))
 
+		// read message to buffer
+		if _, err := buffer.ReadFrom(reader); nil != err {
+			// interrupted network read loop
+			panic(err)
+		}
+
+		// invoke OnData callback
 		if onData := c.ws.OnData; onData != nil {
 			onData(c, buffer.Bytes())
 		}
+
+		// TODO: recreate large buffer for reduce memory usage
+		//
 	}
 }
 

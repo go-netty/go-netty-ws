@@ -21,7 +21,9 @@ import (
 )
 
 func main() {
-	ws := nettyws.NewWebsocket(nettyws.WithBufferSize(4096, 0))
+
+	// tcpkali -c 1000 --connect-rate 500 -r 1000 -T 30s -f 1K.txt --ws 127.0.0.1:8000
+	ws := nettyws.NewWebsocket()
 
 	ws.OnData = func(conn nettyws.Conn, data []byte) {
 		_ = conn.Write(data)
