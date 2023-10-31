@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/go-netty/go-netty v1.6.4
-	github.com/go-netty/go-netty-transport v1.7.4
+	github.com/go-netty/go-netty-transport v1.7.5
 	github.com/gobwas/ws v1.3.0
 )
 
