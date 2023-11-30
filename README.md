@@ -30,14 +30,18 @@ type Option
     func WithBinary() Option
     func WithBufferSize(readBufferSize, writeBufferSize int) Option
     func WithCompress(compressLevel int, compressThreshold int64) Option
+    func WithClientHeader(header http.Header) Option
     func WithMaxFrameSize(maxFrameSize int64) Option
     func WithNoDelay(noDelay bool) Option
+    func WithServerHeader(header http.Header) Option
     func WithServeMux(serveMux *http.ServeMux) Option
     func WithServeTLS(tls *tls.Config) Option
     func WithValidUTF8() Option
 ```
 
 ## Easy to use
+
+> Note: `nettyws` does not support mixed text messages and binary messages, use the `WithBinary` option to switch to binary message mode.
 
 ### server :
 ```go

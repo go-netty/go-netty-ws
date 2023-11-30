@@ -48,6 +48,8 @@ type options struct {
 	compressEnabled   bool
 	compressLevel     int
 	compressThreshold int64
+	requestHeader     http.Header
+	responseHeader    http.Header
 }
 
 func parseOptions(opt ...Option) *options {
@@ -70,6 +72,17 @@ func (wso *options) wsOptions() *websocket.Options {
 	if MsgBinary == wso.messageType {
 		opCode = ws.OpBinary
 	}
+
+	var dialer = ws.DefaultDialer
+	if wso.requestHeader != nil {
+		dialer.Header = ws.HandshakeHeaderHTTP(wso.requestHeader)
+	}
+
+	var upgrader = ws.DefaultHTTPUpgrader
+	if wso.responseHeader != nil {
+		upgrader.Header = wso.responseHeader
+	}
+
 	return &websocket.Options{
 		TLS:               wso.tls,
 		OpCode:            opCode,
@@ -82,8 +95,8 @@ func (wso *options) wsOptions() *websocket.Options {
 		CompressEnabled:   wso.compressEnabled,
 		CompressLevel:     wso.compressLevel,
 		CompressThreshold: wso.compressThreshold,
-		Dialer:            ws.DefaultDialer,
-		Upgrader:          ws.DefaultHTTPUpgrader,
+		Dialer:            dialer,
+		Upgrader:          upgrader,
 		ServeMux:          wso.serveMux,
 	}
 }
@@ -161,5 +174,21 @@ func WithCompress(compressLevel int, compressThreshold int64) Option {
 		options.compressEnabled = true
 		options.compressLevel = compressLevel
 		options.compressThreshold = compressThreshold
+	}
+}
+
+// WithClientHeader is an optional http.Header mapping that could be used to
+// write additional headers to the handshake request.
+func WithClientHeader(header http.Header) Option {
+	return func(options *options) {
+		options.requestHeader = header
+	}
+}
+
+// WithServerHeader is an optional http.Header mapping that could be used to
+// write additional headers to the handshake response.
+func WithServerHeader(header http.Header) Option {
+	return func(options *options) {
+		options.responseHeader = header
 	}
 }

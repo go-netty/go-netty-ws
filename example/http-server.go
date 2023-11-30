@@ -35,7 +35,7 @@ func main() {
 
 	// setup OnData handler
 	ws.OnData = func(conn nettyws.Conn, data []byte) {
-		fmt.Println("OnData: ", conn.RemoteAddr(), ", message: ", string(data))
+		fmt.Println("OnData: ", conn.RemoteAddr(), ", message: ", string(data), ", header: ", conn.Header())
 		conn.Write(data)
 	}
 
