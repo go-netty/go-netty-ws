@@ -18,18 +18,23 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"time"
 
 	nettyws "github.com/go-netty/go-netty-ws"
 )
 
 func main() {
 
+	header := http.Header{}
+	header.Add("client-time", time.Now().String())
+
 	// create websocket instance
-	var ws = nettyws.NewWebsocket()
+	var ws = nettyws.NewWebsocket(nettyws.WithClientHeader(header))
 
 	// setup OnOpen handler
 	ws.OnOpen = func(conn nettyws.Conn) {
-		fmt.Println("OnOpen: ", conn.RemoteAddr())
+		fmt.Println("OnOpen: ", conn.RemoteAddr(), ", header: ", conn.Header())
 		conn.Write([]byte("hello world"))
 	}
 
