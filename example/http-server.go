@@ -47,13 +47,10 @@ func main() {
 	fmt.Println("upgrade websocket connections ....")
 
 	// upgrade websocket connection from http server
-	serveMux := http.NewServeMux()
-	serveMux.HandleFunc("/ws", func(writer http.ResponseWriter, request *http.Request) {
-		ws.UpgradeHTTP(writer, request)
-	})
+	http.Handle("/ws", ws)
 
 	// listen http server
-	if err := http.ListenAndServe(":9527", serveMux); nil != err {
+	if err := http.ListenAndServe(":9527", nil); nil != err {
 		panic(err)
 	}
 }

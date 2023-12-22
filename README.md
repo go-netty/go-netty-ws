@@ -31,6 +31,7 @@ type Option
     func WithBufferSize(readBufferSize, writeBufferSize int) Option
     func WithCompress(compressLevel int, compressThreshold int64) Option
     func WithClientHeader(header http.Header) Option
+    func WithDialer(dialer Dialer) Option
     func WithMaxFrameSize(maxFrameSize int64) Option
     func WithNoDelay(noDelay bool) Option
     func WithServerHeader(header http.Header) Option
@@ -125,13 +126,10 @@ ws.OnClose = func(conn nettyws.Conn, err error) {
 fmt.Println("upgrade websocket connections ....")
 
 // upgrade websocket connection from http server
-serveMux := http.NewServeMux()
-serveMux.HandleFunc("/ws", func(writer http.ResponseWriter, request *http.Request) {
-    ws.UpgradeHTTP(writer, request)
-})
+http.Handle("/ws", ws)
 
 // listen http server
-if err := http.ListenAndServe(":9527", serveMux); nil != err {
+if err := http.ListenAndServe(":9527", nil); nil != err {
     panic(err)
 }
 ```
