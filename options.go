@@ -17,7 +17,9 @@
 package nettyws
 
 import (
+	"context"
 	"crypto/tls"
+	"net"
 	"net/http"
 
 	"github.com/go-netty/go-netty"
@@ -35,6 +37,17 @@ const (
 	MsgBinary
 )
 
+// Dialer is a means to establish a connection.
+type Dialer interface {
+	// Dial connects to the given address via the proxy.
+	Dial(network, addr string) (c net.Conn, err error)
+}
+
+// contextDialer dials using a context
+type contextDialer interface {
+	DialContext(ctx context.Context, network, address string) (net.Conn, error)
+}
+
 type options struct {
 	engine            netty.Bootstrap
 	serveMux          *http.ServeMux
@@ -50,6 +63,7 @@ type options struct {
 	compressThreshold int64
 	requestHeader     http.Header
 	responseHeader    http.Header
+	dialer            Dialer
 }
 
 func parseOptions(opt ...Option) *options {
@@ -76,6 +90,16 @@ func (wso *options) wsOptions() *websocket.Options {
 	var dialer = ws.DefaultDialer
 	if wso.requestHeader != nil {
 		dialer.Header = ws.HandshakeHeaderHTTP(wso.requestHeader)
+	}
+
+	if wso.dialer != nil {
+		ctxDialer, isCtxDialer := wso.dialer.(contextDialer)
+		dialer.NetDial = func(ctx context.Context, network, addr string) (net.Conn, error) {
+			if isCtxDialer {
+				return ctxDialer.DialContext(ctx, network, addr)
+			}
+			return wso.dialer.Dial(network, addr)
+		}
 	}
 
 	var upgrader = ws.DefaultHTTPUpgrader
@@ -190,5 +214,12 @@ func WithClientHeader(header http.Header) Option {
 func WithServerHeader(header http.Header) Option {
 	return func(options *options) {
 		options.responseHeader = header
+	}
+}
+
+// WithDialer specify the client to connect to the network via a dialer.
+func WithDialer(dialer Dialer) Option {
+	return func(options *options) {
+		options.dialer = dialer
 	}
 }

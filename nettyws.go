@@ -102,6 +102,15 @@ func (ws *Websocket) Close() error {
 	return nil
 }
 
+func (ws *Websocket) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+	select {
+	case <-ws.ctx.Done():
+		http.Error(writer, "http: server shutdown", http.StatusNotAcceptable)
+	default:
+		_, _ = ws.upgrader.Upgrade(writer, request)
+	}
+}
+
 // UpgradeHTTP upgrades http connection to the websocket connection
 func (ws *Websocket) UpgradeHTTP(writer http.ResponseWriter, request *http.Request) (conn Conn, err error) {
 
