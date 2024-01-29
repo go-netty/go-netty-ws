@@ -59,9 +59,22 @@ func NewWebsocket(options ...Option) *Websocket {
 }
 
 // Open websocket connection from address
-func (ws *Websocket) Open(addr string) error {
-	_, err := ws.engine.Connect(addr, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
-	return err
+func (ws *Websocket) Open(addr string) (conn Conn, err error) {
+	channel, err := ws.engine.Connect(addr, transport.WithAttachment(ws), transport.WithContext(ws.ctx), websocket.WithOptions(ws.options))
+	if nil == err {
+		channel.Pipeline().IndexOf(func(handler netty.Handler) bool {
+			var ok bool
+			conn, ok = handler.(Conn)
+			return ok
+		})
+
+		if nil == conn {
+			err = fmt.Errorf("not found `Conn` Handler in pipleine")
+			channel.Close(err)
+		}
+
+	}
+	return conn, err
 }
 
 // Listen websocket connections on address

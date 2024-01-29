@@ -22,7 +22,7 @@ type Websocket
     func NewWebsocket(options ...Option) *Websocket
     func (ws *Websocket) Close() error
     func (ws *Websocket) Listen(addr string) error
-    func (ws *Websocket) Open(addr string) error
+    func (ws *Websocket) Open(addr string) (Conn, error)
     func (ws *Websocket) UpgradeHTTP(w http.ResponseWriter, r *http.Request) (Conn, error)
 
 type Option

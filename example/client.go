@@ -51,7 +51,7 @@ func main() {
 	fmt.Println("open websocket connection ...")
 
 	// connect to websocket server
-	if err := ws.Open("ws://127.0.0.1:9527/ws"); nil != err {
+	if _, err := ws.Open("ws://127.0.0.1:9527/ws"); nil != err {
 		panic(err)
 	}
 
