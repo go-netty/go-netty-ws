@@ -23,6 +23,7 @@ type Websocket
     func (ws *Websocket) Close() error
     func (ws *Websocket) Listen(addr string) error
     func (ws *Websocket) Open(addr string) (Conn, error)
+    func (ws *Websocket) ServeHTTP(w http.ResponseWriter, r *http.Request)
     func (ws *Websocket) UpgradeHTTP(w http.ResponseWriter, r *http.Request) (Conn, error)
 
 type Option
@@ -97,7 +98,7 @@ ws.OnClose = func(conn nettyws.Conn, err error) {
 fmt.Println("open websocket connection ...")
 
 // connect to websocket server
-if err := ws.Open("ws://127.0.0.1:9527/ws"); nil != err {
+if _, err := ws.Open("ws://127.0.0.1:9527/ws"); nil != err {
     panic(err)
 }
 ```

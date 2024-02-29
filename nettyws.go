@@ -18,6 +18,7 @@ package nettyws
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
@@ -116,11 +117,12 @@ func (ws *Websocket) Close() error {
 }
 
 func (ws *Websocket) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	select {
-	case <-ws.ctx.Done():
-		http.Error(writer, "http: server shutdown", http.StatusNotAcceptable)
-	default:
-		_, _ = ws.upgrader.Upgrade(writer, request)
+	if _, err := ws.UpgradeHTTP(writer, request); nil != err {
+		if errors.Is(err, ErrServerClosed) {
+			http.Error(writer, "http: server shutdown", http.StatusNotAcceptable)
+		} else {
+			http.Error(writer, err.Error(), http.StatusNotAcceptable)
+		}
 	}
 }
 
