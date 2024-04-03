@@ -42,7 +42,7 @@ func testCase(id int) {
 		onexit <- struct{}{}
 	}
 
-	if err := ws.Open(url); nil != err {
+	if _, err := ws.Open(url); nil != err {
 		log.Println("ws.Open(", url, ") =>", err)
 	}
 
@@ -69,7 +69,7 @@ func updateReports() {
 		onexit <- struct{}{}
 	}
 
-	if err := ws.Open(url); nil != err {
+	if _, err := ws.Open(url); nil != err {
 		log.Println("ws.Open(", url, ") =>", err)
 	}
 
