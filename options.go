@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/go-netty/go-netty"
 	"github.com/go-netty/go-netty-transport/websocket"
@@ -64,6 +65,7 @@ type options struct {
 	requestHeader     http.Header
 	responseHeader    http.Header
 	dialer            Dialer
+	dialTimeout       time.Duration
 }
 
 func parseOptions(opt ...Option) *options {
@@ -88,6 +90,7 @@ func (wso *options) wsOptions() *websocket.Options {
 	}
 
 	var dialer = ws.DefaultDialer
+	dialer.Timeout = wso.dialTimeout
 	if wso.requestHeader != nil {
 		dialer.Header = ws.HandshakeHeaderHTTP(wso.requestHeader)
 	}
@@ -221,5 +224,13 @@ func WithServerHeader(header http.Header) Option {
 func WithDialer(dialer Dialer) Option {
 	return func(options *options) {
 		options.dialer = dialer
+	}
+}
+
+// WithDialTimeout specify the timeout is the maximum amount of time a Dial() will wait for a connect
+// and an handshake to complete.
+func WithDialTimeout(timeout time.Duration) Option {
+	return func(options *options) {
+		options.dialTimeout = timeout
 	}
 }
