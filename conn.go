@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"net/http"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-netty/go-netty"
@@ -37,6 +38,8 @@ type Conn interface {
 	RemoteAddr() string
 	// Header returns the HTTP header on handshake request.
 	Header() http.Header
+	// Request returns the HTTP handshake request.
+	Request() *http.Request
 	// SetDeadline sets the read and write deadlines associated
 	// with the connection. It is equivalent to calling both
 	// SetReadDeadline and SetWriteDeadline.
@@ -68,15 +71,15 @@ type wsc interface {
 }
 
 type wsh interface {
-	Route() string
 	Header() http.Header
+	Request() *http.Request
 }
 
 type wsConn struct {
 	ws       *Websocket
 	channel  netty.Channel
 	client   bool
-	userdata interface{}
+	userdata atomic.Value
 }
 
 // newConn create a websocket connection.
@@ -102,6 +105,11 @@ func (c *wsConn) RemoteAddr() string {
 // Header returns the HTTP header on handshake request.
 func (c *wsConn) Header() http.Header {
 	return c.channel.Transport().(wsh).Header()
+}
+
+// Request returns the HTTP handshake request.
+func (c *wsConn) Request() *http.Request {
+	return c.channel.Transport().(wsh).Request()
 }
 
 // SetDeadline sets the read and write deadlines associated
@@ -146,12 +154,12 @@ func (c *wsConn) Close() error {
 
 // Userdata returns the user-data.
 func (c *wsConn) Userdata() interface{} {
-	return c.userdata
+	return c.userdata.Load()
 }
 
 // SetUserdata sets the user-data.
 func (c *wsConn) SetUserdata(userdata interface{}) {
-	c.userdata = userdata
+	c.userdata.Store(userdata)
 }
 
 func (c *wsConn) HandleActive(ctx netty.ActiveContext) {

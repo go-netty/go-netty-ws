@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/go-netty/go-netty v1.6.6
-	github.com/go-netty/go-netty-transport v1.7.11
+	github.com/go-netty/go-netty-transport v1.7.12
 	github.com/gobwas/ws v1.4.0
 )
 
